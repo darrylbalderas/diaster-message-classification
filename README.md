@@ -1,4 +1,7 @@
-# diaster-message-classification
+# disaster-message-classification
+
+### Motivation
+
 
 ### Installation
 
