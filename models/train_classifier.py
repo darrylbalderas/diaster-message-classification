@@ -21,6 +21,7 @@ from sklearn.externals import joblib
 stop_words = set(stopwords.words('english'))
 
 def load_data(database_filepath):
+    """Loads data from database and returns label and  features dataframe"""
     engine = db.create_engine('sqlite:///{}'.format(database_filepath))
     conn = engine.connect()
     df = pd.read_sql_table('messages', con=conn)
@@ -29,12 +30,14 @@ def load_data(database_filepath):
     return X, Y, list(Y.columns)
 
 def tokenize(text):
+    """Cleans text by lowercase letters, remove any special characters, lemmatize token words and remove and stop words"""
     text = re.sub('[^a-zA-Z0-9]',' ', text.lower().strip())
     tokens = [WordNetLemmatizer().lemmatize(word) for word in word_tokenize(text) if word not in stop_words]
     return tokens
 
 
 def build_model():
+    """Builds a model pipeline that uses grid search best estimator parameters"""
     pipeline = Pipeline(steps=[
         ('vect', CountVectorizer(tokenizer=tokenize, max_df=1.0)),
         ('tfidf', TfidfTransformer()),
@@ -43,6 +46,7 @@ def build_model():
     return pipeline
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    """Prints out classification report for each category name"""
     y_pred = pd.DataFrame(model.predict(X_test), columns=category_names, dtype=int)
     for column in Y_test.columns:
         print("-------{}-------".format(column))
@@ -50,6 +54,7 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
+    """Saves model into a pickle file"""
     joblib.dump(model, model_filepath)
 
     

@@ -4,12 +4,14 @@ import sqlalchemy as db
 
 
 def load_data(messages_filepath, categories_filepath):
+    """Reads message and categories csv and returns a dataframe"""
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
     df = pd.merge(messages, categories, on="id")
     return df
     
 def clean_data(df):
+    """Returns dataframe that has a clean categories column to create lables for training"""
     categories = df['categories'].str.split(pat=';', expand=True)
     category_columns = categories.iloc[:1].apply(lambda x :  x[0][:-2])
     categories.columns = category_columns
@@ -23,6 +25,7 @@ def clean_data(df):
     return df
                                                       
 def save_data(df, database_filename):
+    """Saves dataframe information to a specified database filename"""
     engine = db.create_engine('sqlite:///{}'.format(database_filename))
     df.to_sql('messages', engine, index=False, if_exists='replace')
 
